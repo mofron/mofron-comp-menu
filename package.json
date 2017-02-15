@@ -1,0 +1,22 @@
+{
+  "name": "mofron-comp-menu",
+  "version": "0.0.2",
+  "description": "menu component for mofron",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simpart/mofron-comp-menu.git"
+  },
+  "keywords": [
+    "mofron"
+  ],
+  "author": "simparts",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/simpart/mofron-comp-menu/issues"
+  },
+  "homepage": "https://github.com/simpart/mofron-comp-menu#readme"
+}
