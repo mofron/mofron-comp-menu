@@ -9,19 +9,22 @@ require('mofron-event-click');
  * @brief menu component for mofron
  */
 mofron.comp.Menu = class extends mofron.Component {
-    
-    constructor (prm, opt) {
+    /**
+     * initialize menu component
+     *
+     * @param prm_opt (object) menu element array
+     * @param prm_opt (object) option
+     */
+    constructor (prm_opt) {
         try {
-            super(prm);
+            super();
             this.name('Menu');
             
-            this.sel_evt = function(){};
-            this.sel_idx = null;
-            this.m_size  = new Array(30,150);
+            this.m_selevt = function(){};
+            this.m_selidx = null;
+            this.m_size   = new Array(30,150);
             
-            if (null !== opt) {
-                this.option(opt);
-            }
+            this.prmOpt(prm_opt);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -30,13 +33,19 @@ mofron.comp.Menu = class extends mofron.Component {
     
     initDomConts (prm) {
         try {
-            this.target(this.vdom());
+            var menu = new mofron.Dom('div',this);
+            this.vdom().addChild(menu);
+            this.target(menu);
             
             if (null !== prm) {
-                if ('object' !== (typeof prm)) {
+                if ( ('object'  !== typeof prm) ||
+                     (undefined === prm[0]) ) {
                     throw new Error('invalid parameter');
                 }
                 for (var idx in prm) {
+                    if (true !== mofron.func.isInclude(prm[idx], 'Component')) {
+                        throw new Error('invalid parameter');
+                    }
                     this.addChild(prm[idx]);
                 }
             }
@@ -46,32 +55,39 @@ mofron.comp.Menu = class extends mofron.Component {
         }
     }
     
-    selectIndex (idx) {
+    selectIdx (idx, evt) {
         try {
             if (undefined === idx) {
-                return this.sel_idx;
+                /* getter */
+                return this.m_selidx;
             }
+            /* setter */
             if ('number' !== (typeof idx)) {
                 throw new Error('invalid parameter : ' + idx);
             }
-            this.sel_idx = idx;
+            var _evt = (undefined === evt) ? false : evt;
+            this.m_selidx = idx;
+            if ( (true  === this.isRendered()) &&
+                 (false === _evt) ) {
+                this.child()[this.selectIdx()].getRowDom().click();
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    selectEvent (evt) {
+    selectEvt (evt) {
         try {
             if (undefined === evt) {
                 /* getter */
-                return this.sel_evt;
+                return this.m_selevt;
             }
             /* setter */
             if ('function' !== (typeof evt)) {
                 throw new Error('invalid parameter');
             }
-            this.sel_evt = evt;
+            this.m_selevt = evt;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -139,10 +155,10 @@ mofron.comp.Menu = class extends mofron.Component {
                     try {
                         var menu   = evt[0];
                         var item   = evt[1];
-                        var chdlen = menu.getChild();
+                        var chdlen = menu.child();
                         for (var idx in chdlen) {
-                            if (chdlen[idx].vdom().getChild(0).getId() === item.vdom().getChild(0).getId()) {
-                                menu.selectIndex(parseInt(idx));
+                            if (chdlen[idx].vdom().child()[0].getId() === item.vdom().child()[0].getId()) {
+                                menu.selectIdx(parseInt(idx), true);
                                 break;
                             }
                         }
@@ -153,7 +169,7 @@ mofron.comp.Menu = class extends mofron.Component {
                 },[this,comp])
             );
             comp.addEvent(
-                new mofron.event.Click(this.sel_evt,this)
+                new mofron.event.Click(this.m_selevt,this)
             );
         } catch (e) {
             console.error(e.stack);
@@ -161,3 +177,5 @@ mofron.comp.Menu = class extends mofron.Component {
         }
     }
 }
+mofron.comp.menu = {};
+module.exports = mofron.comp.Menu;
