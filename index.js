@@ -1,26 +1,58 @@
 /**
- * @file Click.js
+ * @file   mofron-comp-menu/index.js
  * @author simpart
  */
+require('mofron-event-click');
 
 /**
- * @class mofron.event.Click
- * @brief click event class for component
+ * @class Menu
+ * @brief menu component for mofron
  */
-mofron.event.Click = class extends mofron.Event {
-    
-    constructor (fnc, prm) {
+mofron.comp.Menu = class extends mofron.Component {
+    /**
+     * initialize menu component
+     *
+     * @param prm_opt (object) menu element array
+     * @param prm_opt (object) option
+     */
+    constructor (prm_opt) {
         try {
             super();
-            this.name('Click');
-            
-            /* font theme */
-            this.m_pointer = true;
-            
-            if ('object' === fnc) {
-                this.prmOpt(fnc);
-            } else {
-                this.handler(fnc, prm);
+            this.name('Menu');
+            this.prmOpt(prm_opt);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    initDomConts (prm) {
+        try {
+            this.vdom().addChild(
+                new mofron.Dom('div',this)
+            );
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    selectIdx (idx, evt) {
+        try {
+            if (undefined === idx) {
+                /* getter */
+                return (undefined === this.m_selidx) ? null : this.m_selidx;
+            }
+            /* setter */
+            if ('number' !== (typeof idx)) {
+                throw new Error('invalid parameter : ' + idx);
+            }
+            var _evt      = (undefined === evt) ? false : evt;
+            this.m_selidx = idx;
+            /* set select index (for dynamic chaging) */
+            if ( (true  === this.target().isPushed()) &&
+                 (false === _evt) ) {
+                this.child()[this.selectIdx()].getRowDom().click();
             }
         } catch (e) {
             console.error(e.stack);
@@ -28,48 +60,106 @@ mofron.event.Click = class extends mofron.Event {
         }
     }
     
-    /**
-     * add click event to target component.
-     */
-    eventConts (tgt_dom) {
+    selectEvt (evt, prm) {
         try {
-            var evt_func = this.handler(); 
-            if (true === this.pointer()) {
-                this.target().style({
-                    'cursor' :  'pointer'
+            if (undefined === evt) {
+                /* getter */
+                return (undefined === this.m_selevt) ? null : this.m_selevt;
+            }
+            /* setter */
+            if ('function' !== (typeof evt)) {
+                throw new Error('invalid parameter');
+            }
+            this.m_selevt = [evt,prm];
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    size (x, y) {
+        try {
+            if ((undefined === x) && (undefined === y)) {
+                /* getter */
+                if (undefined === this.m_size) {
+                    this.size(150, 30);
+                }
+                return this.m_size;
+            }
+            /* setter */
+            if ( (('string' !== typeof x) && ('number' !== typeof x)) ||
+                 (('string' !== typeof y) && ('number' !== typeof y)) ) {
+                throw new Error('invalid parameter');
+            }
+            this.m_size = [x, y];
+            var chd = this.child();
+            for (var chd_idx in chd) {
+                this.setSizeComp(chd[chd_idx]);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    setSizeComp (cmp) {
+        try {
+            var x = ('number' === typeof this.size()[0]) ? this.size()[0] + 'px' : this.size()[0];
+            var y = ('number' === typeof this.size()[1]) ? this.size()[1] + 'px' : this.size()[1];
+            if ( ('function' === typeof cmp['height']) &&
+                 ('function' === typeof cmp['width'])) {
+                cmp.width(x);
+                cmp.height(y);
+            } else if ('function' === typeof cmp['size']) {
+                cmp.size(x, y);
+            } else {
+                cmp.style({
+                    width  : x,
+                    height : y
                 });
             }
-            let tgt = this.target();
-            tgt_dom.getRawDom().addEventListener('click',function() {
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    addChild(comp, disp) {
+        try {
+            super.addChild(comp, disp);
+            this.setSizeComp(comp);
+            
+            let clk_evt = (tgt, prm) => {
                 try {
-                    if (null != evt_func[0]) {
-                        evt_func[0](tgt, evt_func[1]);
+                    let chd = prm.child();
+                    for (var idx in chd) {
+                        if (chd[idx].getId() === tgt.getId()) {
+                            prm.selectIdx(parseInt(idx), true);
+                            break;
+                        }
+                    }
+                    
+                    let sel_evt = prm.selectEvt();
+                    if (null !== sel_evt) {
+                        sel_evt[0](prm, sel_evt[1]);
                     }
                 } catch (e) {
                     console.error(e.stack);
                     throw e;
                 }
-            },false);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    pointer (flg) {
-        try {
-            if (undefined === flg) {
-                return this.m_pointer;
             }
             
-            if ('boolean' !== typeof flg) {
-                throw new Error('invalid parameter');
-            }
-            this.m_pointer = flg;
+            comp.addEvent(
+                new mofron.event.Click(
+                    clk_evt,
+                    this
+                )
+            );
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 }
-module.exports = mofron.event.Click;
+mofron.comp.menu = {};
+module.exports = mofron.comp.Menu;
