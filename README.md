@@ -8,11 +8,11 @@ let Text = require('mofron-comp-text');
 let Menu = require('mofron-comp-menu');
 
 new Menu({
-    param     : [new Text('menu 1'),
-                 new Text('menu 2')],
-    selectEvt : function(menu){
-                    alert('select ' + menu.selectIdx());
-                },
+    child     : [ new Text('menu 1'),
+                      new Text('menu 2') ],
+    selectEvt : function(menu) {
+                          alert('select ' + menu.selectIdx());
+                      },
     visible : true
 });
 ```
