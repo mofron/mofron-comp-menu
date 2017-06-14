@@ -77,12 +77,12 @@ mofron.comp.Menu = class extends mofron.Component {
         }
     }
     
-    size (x, y) {
+    elemSize (x, y) {
         try {
             if ((undefined === x) && (undefined === y)) {
                 /* getter */
                 if (undefined === this.m_size) {
-                    this.size(150, 30);
+                    this.elemSize(150, 30);
                 }
                 return this.m_size;
             }
@@ -104,8 +104,8 @@ mofron.comp.Menu = class extends mofron.Component {
     
     setSizeComp (cmp) {
         try {
-            var x = ('number' === typeof this.size()[0]) ? this.size()[0] + 'px' : this.size()[0];
-            var y = ('number' === typeof this.size()[1]) ? this.size()[1] + 'px' : this.size()[1];
+            var x = ('number' === typeof this.elemSize()[0]) ? this.elemSize()[0] + 'px' : this.elemSize()[0];
+            var y = ('number' === typeof this.elemSize()[1]) ? this.elemSize()[1] + 'px' : this.elemSize()[1];
             if ( ('function' === typeof cmp['height']) &&
                  ('function' === typeof cmp['width'])) {
                 cmp.width(x);
@@ -129,31 +129,36 @@ mofron.comp.Menu = class extends mofron.Component {
             super.addChild(comp, disp);
             this.setSizeComp(comp);
             
-            let clk_evt = (tgt, prm) => {
-                try {
-                    let chd = prm.child();
-                    for (var idx in chd) {
-                        if (chd[idx].getId() === tgt.getId()) {
-                            prm.selectIdx(parseInt(idx), true);
-                            break;
+            comp.addEvent(this.getClickEvent());
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    getClickEvent () {
+        try {
+            return new mofron.event.Click(
+                (tgt, prm) => {
+                    try {
+                        let chd = prm.child();
+                        for (var idx in chd) {
+                            if (chd[idx].getId() === tgt.getId()) {
+                                prm.selectIdx(parseInt(idx), true);
+                                break;
+                            }
                         }
+                        
+                        let sel_evt = prm.selectEvt();
+                        if (null !== sel_evt) {
+                            sel_evt[0](prm, sel_evt[1]);
+                        }
+                    } catch (e) {
+                        console.error(e.stack);
+                        throw e;
                     }
-                    
-                    let sel_evt = prm.selectEvt();
-                    if (null !== sel_evt) {
-                        sel_evt[0](prm, sel_evt[1]);
-                    }
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            }
-            
-            comp.addEvent(
-                new mofron.event.Click(
-                    clk_evt,
-                    this
-                )
+                },
+                this
             );
         } catch (e) {
             console.error(e.stack);

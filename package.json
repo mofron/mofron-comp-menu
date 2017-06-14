@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-menu",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "menu component for mofron",
   "main": "index.js",
   "scripts": {
