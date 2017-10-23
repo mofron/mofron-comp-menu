@@ -148,11 +148,18 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    setHorizon (flg) {
+    horizon (flg) {
         try {
-            this.target().style({
-                'display' : (true === flg) ? 'flex' : null
-            });
+            if (undefined === flg) {
+                /* getter */
+                let disp = this.target().style('display');
+                return (disp === null) ? false : true;
+            } else {
+                /* setter */
+                this.target().style({
+                    'display' : (true === flg) ? 'flex' : null
+                });
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;

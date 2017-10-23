@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-menu",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "menu component for mofron",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/simpart/mofron-comp-menu.git"
+  },
+  "dependencies": {
+    "mofron-event-click" : "",
+    "mofron-effect-center" : ""
   },
   "keywords": [
     "mofron"
