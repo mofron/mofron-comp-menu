@@ -5,7 +5,7 @@
 let mf     = require('mofron');
 let Click  = require('mofron-event-click');
 let Center = require('mofron-effect-center');
-require('mofron-comp-text');
+let Text   = require('mofron-comp-text');
 
 /**
  * @class Menu
@@ -36,7 +36,7 @@ mf.comp.Menu = class extends mf.Component {
             }
             for (let cidx in cnt) {
                 if ('string' === typeof cnt[cidx]) {
-                    let txt = this.theme().component('mofron-comp-text');
+                    let txt = new Text();
                     txt.execOption({
                         text      : cnt[cidx],
                         size      : 25,
@@ -50,7 +50,7 @@ mf.comp.Menu = class extends mf.Component {
                             'align-items' : 'center'
                         }
                     });
-                    this.setMenuConf(wrp);
+                    this.setMenuConf();
                     this.addChild(wrp);
                 } else  {
                     this.addChild(cnt[cidx]);
@@ -62,32 +62,6 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    size (x, y) {
-        try {
-            if (undefined === x) {
-                /* getter */
-                return (undefined === this.m_size) ? null : this.m_size;
-            }
-            /* setter */
-            if ( ((null !== x) && ('number' !== typeof x)) ||
-                 ((null !== y) && ('number' !== typeof y)) ) {
-                throw new Error('invalid paramter');
-            }
-            if (undefined === this.m_size) {
-                this.m_size = new Array(null, null);
-            }
-            if ('number' === typeof x) {
-                this.m_size[0] = x;
-            }
-            if ('number' === typeof y) {
-                this.m_size[1] = y;
-            }
-            this.setMenuConf();
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
     
     margin (x, y) {
         try {
@@ -127,10 +101,22 @@ mf.comp.Menu = class extends mf.Component {
             } else {
                 /* set parameter contents */
                 if (null !== this.size()) {
-                    cmp.style({
-                        'width'  : (null === this.size()[0]) ? undefined : this.size()[0] + 'px',
-                        'height' : (null === this.size()[1]) ? undefined : this.size()[1] + 'px'
-                    });
+                    let siz = this.size();
+                    if (true === this.horizon()) {
+                        cmp.width(
+                            (null === siz[0]) ? null : siz[0] / this.child().length + 'px'
+                        );
+                        cmp.height(
+                            (null === siz[1]) ? undefined : siz[1] + 'px'
+                        );
+                    } else {
+                        cmp.width(
+                            (null === siz[0]) ? undefined : siz[0] + 'px'
+                        );
+                        cmp.height(
+                            (null === siz[1]) ? null : siz[1] / this.child().length + 'px'
+                        );
+                    }
                 } else if (null !== this.margin()) {
                     let xmrg = (null === this.margin()[0]) ? 0 : this.margin()[0];
                     let ymrg = (null === this.margin()[1]) ? 0 : this.margin()[1];
@@ -206,10 +192,11 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    addChild(comp) {
+    addChild(comp, idx) {
         try {
-            super.addChild(comp);
+            super.addChild(comp, idx);
             comp.addEvent(this.getClickEvent());
+            this.setMenuConf();
         } catch (e) {
             console.error(e.stack);
             throw e;
