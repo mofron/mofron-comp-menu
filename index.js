@@ -146,8 +146,11 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    addChild(comp, idx) {
+    addChild(comp, idx, flg) {
         try {
+            if (false === flg) {
+                return super.addChild(comp, idx);
+            }
             comp.addEvent(this.getClickEvent());
             let set_cmp = comp;
             if (true === mf.func.isInclude(comp, 'Button')) {
