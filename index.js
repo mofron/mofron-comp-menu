@@ -129,7 +129,7 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    selectEvt (evt, prm) {
+    selectEvent (evt, prm) {
         try {
             if (undefined === evt) {
                 /* getter */
@@ -177,9 +177,9 @@ mf.comp.Menu = class extends mf.Component {
                             }
                         }
                         /* exec callback */
-                        let sel_evt = prm.selectEvt();
+                        let sel_evt = prm.selectEvent();
                         if (null !== sel_evt) {
-                            sel_evt[0](prm, sel_evt[1]);
+                            sel_evt[0](prm.selectIdx(), prm, sel_evt[1]);
                         }
                     } catch (e) {
                         console.error(e.stack);
