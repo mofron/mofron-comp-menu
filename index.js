@@ -71,7 +71,7 @@ mf.comp.Menu = class extends mf.Component {
                     if (true === this.horizon()) {
                         cmp.width(wid / this.child().length + 'px', false);
                     } else {
-                        cmp.width(wid);
+                        cmp.width(wid+1);
                     }
                 }
                 if (null !== hei) {
