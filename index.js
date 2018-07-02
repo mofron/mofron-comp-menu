@@ -29,6 +29,19 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
+    initDomConts (prm) {
+        try {
+            super.initDomConts();
+            if (undefined !== prm) {
+                this.text(prm);
+            }
+            
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     width (val, flg) {
         try {
             let ret = super.width(val);
@@ -191,6 +204,36 @@ mf.comp.Menu = class extends mf.Component {
                 },
                 this
             );
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    text (prm) {
+        try {
+            if (undefined === prm) {
+                /* not supporte */
+                return null;
+            }
+            /* setter */
+            let set_prm = new Array();
+            if (true === Array.isArray(prm)) {
+                set_prm = prm;
+            } else if ('string' === typeof prm) {
+                set_prm.push(new Text(prm));
+            } else {
+                throw new Error('invalid parameter');
+            }
+            
+            for (let pidx in set_prm) {
+                if ('string' === typeof set_prm[pidx]) {
+                    set_prm[pidx] = new Text(set_prm[pidx]);
+                } else if (true !== mf.func.isInclude(set_prm[pidx], 'Text')) {
+                    throw new Error('invalid parameter');
+                }
+                this.addChild(set_prm[pidx]);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
