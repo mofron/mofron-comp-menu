@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-menu",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "menu component for mofron",
   "main": "index.js",
   "scripts": {
@@ -12,13 +12,13 @@
   },
   "dependencies": {
     "mofron-event-click" : "",
-    "mofron-effect-center" : ""
+    "mofron-layout-relative" : ""
   },
   "keywords": [
-    "mofron"
+    "front-end"
   ],
   "author": "simparts",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/simpart/mofron-comp-menu/issues"
   },
