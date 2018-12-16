@@ -14,13 +14,14 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * initialize menu component
      *
-     * @param prm_opt (object) menu element array
-     * @param prm_opt (object) option
+     * @param p1 (Component) menu element array
+     * @param p1 (object) component option
      */
     constructor (po) {
         try {
             super();
             this.name('Menu');
+            this.prmMap('item');
             this.prmOpt(po);
         } catch (e) {
             console.error(e.stack);
@@ -28,6 +29,26 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
+    /**
+     * initialize select
+     *
+     * @note private method
+     */
+    afterRender () {
+        try {
+            super.afterRender();
+            if (null !== this.selectIndex()) {
+                this.item()[this.selectIndex()].eventTgt().getRawDom().click();
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * width setter/getter
+     */
     width (prm) {
         try {
             let ret = super.width(prm);
@@ -52,6 +73,9 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
+    /**
+     * height setter/getter
+     */
     height (prm) {
         try {
             let ret = super.height(prm);
@@ -76,6 +100,13 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
+    /**
+     * horizon config
+     *
+     * @param p1 (true)  set horizon position
+     * @param p1 (false) set vertical positon
+     * @return (boolean) position flag
+     */
     horizon (flg) {
         try {
             if (undefined === flg) {
@@ -91,23 +122,40 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    selectIndex (idx) {
+    /**
+     * select index setter/getter
+     *
+     * @param p1 (number) select index
+     * @param p1 (null) release select
+     * @param p1 (undefined) call as getter
+     * @param p2 (boolean) event flag
+     * @return (number) selected index
+     */
+    selectIndex (idx, flg) {
         try {
-            if (undefined === idx) {
-                /* getter */
-                return (undefined === this.m_selidx) ? null : this.m_selidx;
+            idx = (null === idx) ? -1 : idx;
+            let ret = this.member('selectIndex', 'number', idx, 0);
+            if ( (undefined !== idx) && (false === flg) ) {
+                if (-1 !== idx) {
+                    this.item()[idx].eventTgt().getRawDom().click();
+                } else {
+                    this.execSelect(null); 
+                }
             }
-            /* setter */
-            if (('number' !== typeof idx) || (undefined === this.child()[idx])) {
-                throw new Error('invalid parameter : ' + idx);
-            }
-            this.child()[idx].eventTgt().getRawDom.click();
+            return (-1 === ret) ? null : ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * select event setter/getter
+     *
+     * @param p1 (function) event function
+     * @param p2 (mix) function parameter
+     * @return (array) [ function, parameter ]
+     */
     selectEvent (evt, prm) {
         try {
             if (undefined === evt) {
@@ -128,15 +176,16 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
+    /**
+     * execute select event
+     *
+     * @note private method
+     */
     execSelect (idx) {
         try {
-            if (('number' !== typeof idx) || (undefined === this.child()[idx])) {
-                throw new Error('invalid parameter : ' + idx);
-            }
-            this.m_selidx = idx;
             let evt = this.selectEvent();
             for (let eidx in evt) {
-                evt[eidx][0](idx, evt[eidx][1], this);
+                evt[eidx][0](this, idx, evt[eidx][1]);
             }
         } catch (e) {
             console.error(e.stack);
@@ -144,15 +193,18 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    addChild(chd, idx) {
+    /**
+     * add menu item component
+     */
+    addItem(prm) {
         try {
-            let ret = super.addChild(chd, idx);
-            let clk = (p1, p2) => {
+            let ret = this.addChild(prm);
+            let clk = (clk1_cmp, clk2, clk3) => {
                 try {
-                    let chd = p2.child();
+                    let chd = clk3.child();
                     for (let cidx in chd) {
-                        if (p1.getId() === chd[cidx].getId()) {
-                            p2.execSelect(parseInt(cidx));
+                        if (clk1_cmp.getId() === chd[cidx].getId()) {
+                            clk3.execSelect(parseInt(cidx));
                         }
                     }
                 } catch (e) {
@@ -160,14 +212,43 @@ mf.comp.Menu = class extends mf.Component {
                     throw e;
                 }
             }
-            chd.execOption({ event : [ new Click(new mf.Param(clk, this)) ] });
-            this.size(this.width(), this.height());
+            prm.execOption({ event : [ new Click(new mf.Param(clk, this)) ] });
+            this.arrayMember('item', 'Component', prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * menu item component setter/getter
+     *
+     */
+    item (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                return this.arrayMember('item', 'Component');
+            }
+            /* setter */
+            if (true === Array.isArray(prm)) {
+                for (let pidx in prm) {
+                    this.addItem(prm[pidx]);
+                }
+                return;
+            }
+            this.addItem(prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * menu item offset of position
+     *
+     * @param p1 (string) css size value
+     */
     offset (prm) {
         try {
             this.layout([
