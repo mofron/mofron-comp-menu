@@ -14,14 +14,13 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * initialize menu component
      *
-     * @param p1 (Component) menu element array
-     * @param p1 (object) component option
+     * @param prm_opt (object) menu element array
+     * @param prm_opt (object) option
      */
     constructor (po) {
         try {
             super();
             this.name('Menu');
-            this.prmMap('item');
             this.prmOpt(po);
         } catch (e) {
             console.error(e.stack);
@@ -30,15 +29,15 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * initialize select
+     * selected initialize menu item
      *
      * @note private method
      */
     afterRender () {
         try {
             super.afterRender();
-            if (null !== this.selectIndex()) {
-                this.item()[this.selectIndex()].eventTgt().getRawDom().click();
+            if (null !== this.select()) {
+                this.item()[this.select()].eventTgt().getRawDom().click();
             }
         } catch (e) {
             console.error(e.stack);
@@ -46,9 +45,6 @@ mf.comp.Menu = class extends mf.Component {
         }
     }
     
-    /**
-     * width setter/getter
-     */
     width (prm) {
         try {
             let ret = super.width(prm);
@@ -57,7 +53,7 @@ mf.comp.Menu = class extends mf.Component {
                 let siz = this.sizeValue('width');
                 let chd = this.child();
                 for (let cidx in chd) {
-                    if (true === this.horizon()) {
+                    if (true === this.horiz()) {
                         chd[cidx].width(
                             (siz.value() / this.child().length) + siz.type()
                         );
@@ -74,7 +70,7 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * height setter/getter
+     * menu height setter/getter
      */
     height (prm) {
         try {
@@ -84,7 +80,7 @@ mf.comp.Menu = class extends mf.Component {
                 let siz = this.sizeValue('height');
                 let chd = this.child();
                 for (let cidx in chd) {
-                    if (true === this.horizon()) {
+                    if (true === this.horiz()) {
                         chd[cidx].height(this.height());
                     } else {
                         chd[cidx].height(
@@ -101,13 +97,12 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * horizon config
+     * set/unset horizontal mode
+     * menu item is added in the horizontal direction if p1 setted true
      *
-     * @param p1 (true)  set horizon position
-     * @param p1 (false) set vertical positon
-     * @return (boolean) position flag
+     * @param p1 (boolean) set/unset horizontal mode
      */
-    horizon (flg) {
+    horiz (flg) {
         try {
             if (undefined === flg) {
                 /* getter */
@@ -123,18 +118,17 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * select index setter/getter
+     * select menu item, selected menu item index
      *
-     * @param p1 (number) select index
-     * @param p1 (null) release select
-     * @param p1 (undefined) call as getter
-     * @param p2 (boolean) event flag
-     * @return (number) selected index
+     * @param p1 (number) select menu item index
+     * @param p1 (undefined) call as selected index getter
+     * @param p2 (boolean) it doesn't execute select event (only item click) when it setted false.
+     * @return (number)  selected menu item index
      */
-    selectIndex (idx, flg) {
+    select (idx, flg) {
         try {
             idx = (null === idx) ? -1 : idx;
-            let ret = this.member('selectIndex', 'number', idx, 0);
+            let ret = this.member('select', 'number', idx, 0);
             if ( (undefined !== idx) && (false === flg) ) {
                 if (-1 !== idx) {
                     this.item()[idx].eventTgt().getRawDom().click();
@@ -152,9 +146,10 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * select event setter/getter
      *
-     * @param p1 (function) event function
-     * @param p2 (mix) function parameter
-     * @return (array) [ function, parameter ]
+     * @param p1 (function) select event function
+     * @param p1 (undefined) call as getter
+     * @param p2 (mixed) select event parameter
+     * @return (array) select event [[function, parameter], ...]
      */
     selectEvent (evt, prm) {
         try {
@@ -194,7 +189,10 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * add menu item component
+     * add menu item
+     * add click event to item
+     *
+     * @note private method
      */
     addItem(prm) {
         try {
@@ -221,8 +219,12 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * menu item component setter/getter
+     * menu item setter/getter
      *
+     * @param p1 (Component) add menu item
+     * @param p1 (array) add menu item ([Component,...])
+     * @param p1 (undefined) call as getter
+     * @return (array) menu item ([Component,...])
      */
     item (prm) {
         try {
@@ -245,14 +247,17 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * menu item offset of position
-     *
-     * @param p1 (string) css size value
+     * set menu item offset of position
+     * 
+     * @param p1 (string) offset value (css size)
      */
     offset (prm) {
         try {
             this.layout([
-                new Relat((true === this.horizon()) ? 'left' : 'top', prm) 
+                new Relat(
+                    (true === this.horizon()) ? 'left' : 'top',
+                    prm
+                )
             ]);
         } catch (e) {
             console.error(e.stack);
