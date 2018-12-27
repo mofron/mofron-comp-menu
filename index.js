@@ -30,21 +30,45 @@ mf.comp.Menu = class extends mf.Component {
     
     /**
      * selected initialize menu item
+     * add contents switch
      *
      * @note private method
      */
     afterRender () {
         try {
             super.afterRender();
+            /* selected initialize menu item */
             if (null !== this.select()) {
                 this.item()[this.select()].eventTgt().getRawDom().click();
             }
+            /* add contents switch */
+            let sel_evt = (evt_mnu, evt_idx) => {
+                try {
+                    let conts   = evt_mnu.contents();
+                    let swh_cmp = null;
+                    for (let cidx in conts) {
+                        
+                        swh_cmp = ('string' === typeof conts[cidx]) ? mf.func.objkey(conts[cidx]) : conts[cidx];
+                        swh_cmp.visible(
+                            (evt_idx == cidx) ? true : false
+                        );
+                        
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            };
+            this.selectEvent(sel_evt);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * menu width setter/getter
+     */
     width (prm) {
         try {
             let ret = super.width(prm);
@@ -133,6 +157,12 @@ mf.comp.Menu = class extends mf.Component {
                 if (-1 !== idx) {
                     this.item()[idx].eventTgt().getRawDom().click();
                 } else {
+                    let itm = this.item();
+                    for (let iidx in itm) {
+                        if (true === mf.func.isComp(itm[iidx], 'MenuItem')) {
+                            itm[iidx].select((iidx == idx) ? true : false);
+                        }
+                    }
                     this.execSelect(null); 
                 }
             }
@@ -199,7 +229,7 @@ mf.comp.Menu = class extends mf.Component {
             let ret = this.addChild(prm);
             let clk = (clk1_cmp, clk2, clk3) => {
                 try {
-                    let chd = clk3.child();
+                    let chd = clk3.item();
                     for (let cidx in chd) {
                         if (clk1_cmp.getId() === chd[cidx].getId()) {
                             clk3.execSelect(parseInt(cidx));
@@ -259,6 +289,43 @@ mf.comp.Menu = class extends mf.Component {
                     prm
                 )
             ]);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * contents component setter/getter
+     *
+     * @param p1 (Component) add contents
+     * @param p1 (string) objkey of contents
+     * @param p1 (array) add contents array (Component, string, both)
+     * @param p1 (undefined) call as getter
+     * @return (array) contents (Component array)
+     * @attention content is not included in the menu child component.
+     */
+    contents (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                return (undefined === this.m_conts) ? [] : this.m_conts;
+            }
+            /* setter */
+            if (true === Array.isArray(prm)) {
+                for (let pidx in prm) {
+                    this.contents(prm[pidx]);
+                }
+                return;
+            }
+            if ( (false === mf.func.isInclude(prm, 'Component')) &&
+                 ('string' !== typeof prm) ) {
+                throw new Error('invalid parameter');
+            }
+            if (undefined === this.m_conts) {
+                this.m_conts = [];
+            }
+            this.m_conts.push(prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
