@@ -37,10 +37,7 @@ mf.comp.Menu = class extends mf.Component {
     afterRender () {
         try {
             super.afterRender();
-            /* selected initialize menu item */
-            if (null !== this.select()) {
-                this.item()[this.select()].eventTgt().getRawDom().click();
-            }
+            
             /* add contents switch */
             let sel_evt = (evt_mnu, evt_idx) => {
                 try {
@@ -60,6 +57,11 @@ mf.comp.Menu = class extends mf.Component {
                 }
             };
             this.selectEvent(sel_evt);
+            
+            /* selected initialize menu item */
+            if (null !== this.select()) {
+                this.item()[this.select()].eventTgt().getRawDom().click();
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
