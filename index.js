@@ -1,27 +1,67 @@
 /**
- * @file   mofron-comp-menu/index.js
+ * @file mofron-comp-menu/index.js
+ * @brief menu component for mofron 
  * @author simpart
  */
-const mf    = require('mofron');
-const Click = require('mofron-event-click');
-const Relat = require('mofron-layout-relative');
+const mf    = require("mofron");
+const Click = require("mofron-event-click");
+const Relat = require("mofron-layout-relative");
 
-/**
- * @class Menu
- * @brief menu component for mofron
- */
 mf.comp.Menu = class extends mf.Component {
     /**
      * initialize menu component
      *
-     * @param prm_opt (object) menu element array
-     * @param prm_opt (object) option
+     * @param (object) component option
+     * @type private
      */
     constructor (po) {
         try {
             super();
-            this.name('Menu');
+            this.name("Menu");
             this.prmOpt(po);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * init size
+     *
+     * @type private
+     */
+    beforeRender () {
+        try {
+            super.beforeRender();
+            let chd = this.child();
+            /* set width */
+            if (null !== this.width()) {
+                let wid = mf.func.getSize(this.width());
+                if (true === this.horizon()) {
+                    wid.value(wid.value()/chd.length);
+                }
+                for (let cidx in chd) {
+                    chd[cidx].width(wid.toString());
+                }
+            }
+            
+            /* set height */
+            if (null !== this.height()) {
+                let hei = mf.func.getSize(this.height());
+                if (true !== this.horizon()) {
+                    hei.value(hei.value()/chd.length);
+                }
+                for (let cidx in chd) {
+                    chd[cidx].height(hei.toString());
+                }
+            }
+            
+            /* set offset */
+            if (null !== this.offset()) {
+                this.layout([
+                    new Relat((true === this.horizon()) ? "left" : "top", prm)
+                ]);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -32,90 +72,14 @@ mf.comp.Menu = class extends mf.Component {
      * selected initialize menu item
      * add contents switch
      *
-     * @note private method
+     * @type private
      */
     afterRender () {
         try {
             super.afterRender();
-            
-            /* add contents switch */
-            let sel_evt = (evt_mnu, evt_idx) => {
-                try {
-                    let conts   = evt_mnu.contents();
-                    let swh_cmp = null;
-                    for (let cidx in conts) {
-                        
-                        swh_cmp = ('string' === typeof conts[cidx]) ? mf.func.objkey(conts[cidx]) : conts[cidx];
-                        swh_cmp.visible(
-                            (evt_idx == cidx) ? true : false
-                        );
-                        
-                    }
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            };
-            this.selectEvent(sel_evt);
-            
-            /* selected initialize menu item */
-            if (null !== this.select()) {
+            if (undefined !== this.item()[this.select()]) {
                 this.item()[this.select()].eventTgt().getRawDom().click();
             }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * menu width setter/getter
-     */
-    width (prm) {
-        try {
-            let ret = super.width(prm);
-            if (undefined === ret) {
-                /* setter */
-                let siz = this.sizeValue('width');
-                let chd = this.child();
-                for (let cidx in chd) {
-                    if (true === this.horiz()) {
-                        chd[cidx].width(
-                            (siz.value() / this.child().length) + siz.type()
-                        );
-                    } else {
-                        chd[cidx].width(this.width());
-                    }
-                }
-            }
-            return ret;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * menu height setter/getter
-     */
-    height (prm) {
-        try {
-            let ret = super.height(prm);
-            if (undefined === ret) {
-                /* setter */
-                let siz = this.sizeValue('height');
-                let chd = this.child();
-                for (let cidx in chd) {
-                    if (true === this.horiz()) {
-                        chd[cidx].height(this.height());
-                    } else {
-                        chd[cidx].height(
-                            (siz.value() / this.child().length) + siz.type()
-                        );
-                    }
-                }
-            }
-            return ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -126,9 +90,10 @@ mf.comp.Menu = class extends mf.Component {
      * set/unset horizontal mode
      * menu item is added in the horizontal direction if p1 setted true
      *
-     * @param p1 (boolean) set/unset horizontal mode
+     * @param (boolean) set/unset horizontal mode
+     * @type parameter
      */
-    horiz (flg) {
+    horizon (flg) {
         try {
             if (undefined === flg) {
                 /* getter */
@@ -144,31 +109,31 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * select menu item, selected menu item index
+     * select menu item
      *
-     * @param p1 (number) select menu item index
-     * @param p1 (null) release seleced
-     * @param p1 (undefined) call as selected index getter
-     * @param p2 (boolean) it doesn't execute select event (only item click) when it setted false.
-     * @return (number)  selected menu item index
+     * @param (number) select menu item index
+     * @return (number) selected menu item index
+     * @type parameter
+     * @note p2 : event flag (undefined/false is not execute select event)
      */
     select (idx, flg) {
         try {
-            let ret = this.member('select', 'number', idx, 0);
-            if (undefined === idx) {
-                /* getter */
-                return ret;
-            }
-            /* setter */
-            let itm = this.item();
-            for (let iidx in itm) {
-                if (true === mf.func.isComp(itm[iidx], 'MenuItem')) {
-                    itm[iidx].select((iidx == idx) ? true : false);
+            if ("number" === typeof idx) {
+                if (true === flg) {
+                    let evt = this.selectEvent();
+                    for (let eidx in evt) {
+                        evt[eidx][0](this, idx, evt[eidx][1]);
+                    }
+                }
+                if (undefined !== this.contents()[idx]) {
+                    let conts = this.contents();
+                    for (let cidx in conts) {
+                        conts[cidx].visible(false);
+                    }
+                    conts[idx].visible(true);
                 }
             }
-            if ((null !== idx) && (false !== flg)) {
-                this.execSelect(idx);
-            }
+            return this.member("select", "number", idx, 0);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -176,65 +141,56 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * select event setter/getter
+     * select event
      *
-     * @param p1 (function) select event function
-     * @param p1 (undefined) call as getter
-     * @param p2 (mixed) select event parameter
+     * @param (function) select event function
+     * @param (mixed) select event parameter
      * @return (array) select event [[function, parameter], ...]
+     * @type parameter
      */
-    selectEvent (evt, prm) {
+    selectEvent (fnc, prm) {
         try {
-            if (undefined === evt) {
+            if ( (undefined !== fnc) && ("function" !== typeof fnc)) {
+                throw new Error("invalid parameter");
+            }
+            return this.arrayMember(
+                "selectEvent",
+                "object",
+                (undefined !== fnc) ? [fnc, prm] : undefined
+            );
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * menu item
+     *
+     * @param (array/component) menu items
+     * @return (array) menu items
+     * @type parameter
+     */
+    item (prm) {
+        try {
+            if (undefined === prm) {
                 /* getter */
-                return (undefined === this.m_selevt) ? [] : this.m_selevt;
+                return this.arrayMember("item", "Component");
             }
             /* setter */
-            if ('function' !== (typeof evt)) {
-                throw new Error('invalid parameter');
+            if (true === Array.isArray(prm)) {
+                for (let pidx in prm) {
+                    this.item(prm[pidx]);
+                }
+                return;
             }
-            if (undefined === this.m_selevt) {
-                this.m_selevt = [];
-            }
-            this.m_selevt.push([evt, prm]);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * execute select event
-     *
-     * @note private method
-     */
-    execSelect (idx) {
-        try {
-            let evt = this.selectEvent();
-            for (let eidx in evt) {
-                evt[eidx][0](this, idx, evt[eidx][1]);
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * add menu item
-     * add click event to item
-     *
-     * @note private method
-     */
-    addItem(prm) {
-        try {
-            let ret = this.addChild(prm);
-            let clk = (clk1_cmp, clk2, clk3) => {
+            let menu = this;
+            let clk = (cp1, cp2, cp3) => {
                 try {
-                    let itm = clk3.item();
+                    let itm = menu.item();
                     for (let iidx in itm) {
-                        if (clk1_cmp.getId() === itm[iidx].getId()) {
-                            clk3.select(parseInt(iidx));
+                        if (cp1.getId() === itm[iidx].getId()) {
+                            menu.select(parseInt(iidx), true);
                         }
                     }
                 } catch (e) {
@@ -242,8 +198,9 @@ mf.comp.Menu = class extends mf.Component {
                     throw e;
                 }
             }
-            prm.execOption({ event : [ new Click([clk, this]) ] });
-            this.arrayMember('item', 'Component', prm);
+            prm.option({ event: new Click(clk) });
+            this.child([prm]);
+            this.arrayMember("item", "Component", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -251,46 +208,17 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * menu item setter/getter
-     *
-     * @param p1 (Component) add menu item
-     * @param p1 (array) add menu item ([Component,...])
-     * @param p1 (undefined) call as getter
-     * @return (array) menu item ([Component,...])
-     */
-    item (prm) {
-        try {
-            if (undefined === prm) {
-                /* getter */
-                return this.arrayMember('item', 'Component');
-            }
-            /* setter */
-            if (true === Array.isArray(prm)) {
-                for (let pidx in prm) {
-                    this.addItem(prm[pidx]);
-                }
-                return;
-            }
-            this.addItem(prm);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * set menu item offset of position
+     * offset position of menu item
      * 
-     * @param p1 (string) offset value (css size)
+     * @param (string (size)) offset value
+     * @type parameter
      */
     offset (prm) {
         try {
-            this.layout([
-                new Relat(
-                    (true === this.horizon()) ? 'left' : 'top',
-                    prm
-                )
-            ]);
+            if (undefined !== prm) {
+                mf.func.getSize(prm);
+            }
+            return this.member("offset", "string", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -298,36 +226,18 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
-     * contents component setter/getter
+     * contents component
      *
-     * @param p1 (Component) add contents
-     * @param p1 (string) objkey of contents
-     * @param p1 (array) add contents array (Component, string, both)
-     * @param p1 (undefined) call as getter
-     * @return (array) contents (Component array)
-     * @attention content is not included in the menu child component.
+     * @param (string/array) objkey of contents
+     * @return (array) objkey of contents
+     * @type parameter
      */
     contents (prm) {
         try {
-            if (undefined === prm) {
-                /* getter */
-                return (undefined === this.m_conts) ? [] : this.m_conts;
+            if (undefined !== prm) {
+                mf.objkey[prm].visible(false);
             }
-            /* setter */
-            if (true === Array.isArray(prm)) {
-                for (let pidx in prm) {
-                    this.contents(prm[pidx]);
-                }
-                return;
-            }
-            if ( (false === mf.func.isInclude(prm, 'Component')) &&
-                 ('string' !== typeof prm) ) {
-                throw new Error('invalid parameter');
-            }
-            if (undefined === this.m_conts) {
-                this.m_conts = [];
-            }
-            this.m_conts.push(prm);
+            return this.arrayMember("contents", "string", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;

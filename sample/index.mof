@@ -1,0 +1,16 @@
+<require>
+    <tag module="mofron-comp-txtframe">TxtFrame</tag>
+    <tag module="mofron-comp-menu">Menu</tag>
+</require>
+
+<script run=init>
+let evt = (p1,p2) => { console.log(p2); };
+</script>
+
+<Menu selectEvent=evt size="1.5rem","1rem" offset="-0.01rem">
+    <item>
+        <TxtFrame>menu 1</TxtFrame>
+        <TxtFrame>menu 2</TxtFrame>
+        <TxtFrame>menu 3</TxtFrame>
+    </item>
+</Menu>
