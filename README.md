@@ -3,6 +3,9 @@
 
 menu component for mofron 
 
+## Feature
+ - configure the displayed contents when users click the menu by "contents" parameter
+ - "horizon" parameter is config that is horizontal menu item or vertical menu item
 
 # Install
 ```
@@ -36,7 +39,7 @@ let evt = (p1,p2) => { console.log(p2); };
 | | select | number | select menu item index |
 | | selectEvent | function | select event function |
 | | | mixed | select event parameter |
-| | item | array/component | menu items |
+| ◯  | item | array/component | menu items |
 | | offset | string (size) | offset value |
 | | contents | string/array | objkey of contents |
 

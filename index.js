@@ -1,6 +1,8 @@
 /**
  * @file mofron-comp-menu/index.js
  * @brief menu component for mofron 
+ * @feature configure the displayed contents when users click the menu by "contents" parameter
+ *          "horizon" parameter is config that is horizontal menu item or vertical menu item
  * @author simpart
  */
 const mf    = require("mofron");
@@ -11,13 +13,16 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * initialize menu component
      *
-     * @param (object) component option
+     * @param (array/object) array: menu item component list
+     *                       object: component option
+     * @pmap item
      * @type private
      */
     constructor (po) {
         try {
             super();
             this.name("Menu");
+            this.prmMap("item");
             this.prmOpt(po);
         } catch (e) {
             console.error(e.stack);
