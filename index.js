@@ -31,6 +31,21 @@ mf.comp.Menu = class extends mf.Component {
     }
     
     /**
+     * initialize dom contents
+     *
+     * @type private
+     */
+    initDomConts () {
+        try {
+            super.initDomConts();
+            this.layout(new Relat({ value: "0px", tag: "Menu" }));
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
      * init size
      *
      * @type private
@@ -42,30 +57,22 @@ mf.comp.Menu = class extends mf.Component {
             /* set width */
             if (null !== this.width()) {
                 let wid = mf.func.getSize(this.width());
-                if (true === this.horizon()) {
+                if ( (true === this.horizon()) && (0 !== chd.length) ) {
                     wid.value(wid.value()/chd.length);
                 }
                 for (let cidx in chd) {
                     chd[cidx].width(wid.toString());
                 }
             }
-            
             /* set height */
             if (null !== this.height()) {
                 let hei = mf.func.getSize(this.height());
-                if (true !== this.horizon()) {
+                if ( (true !== this.horizon()) && (0 !== chd.length) ) {
                     hei.value(hei.value()/chd.length);
                 }
                 for (let cidx in chd) {
                     chd[cidx].height(hei.toString());
                 }
-            }
-            
-            /* set offset */
-            if (null !== this.offset()) {
-                this.layout([
-                    new Relat((true === this.horizon()) ? "left" : "top", prm)
-                ]);
             }
         } catch (e) {
             console.error(e.stack);
@@ -82,8 +89,14 @@ mf.comp.Menu = class extends mf.Component {
     afterRender () {
         try {
             super.afterRender();
+            /* select defalut index */
             if (undefined !== this.item()[this.select()]) {
                 this.item()[this.select()].eventTgt().getRawDom().click();
+                let evt = this.selectEvent();
+                for (let eidx in evt) {
+                    evt[eidx][0](this, this.select(), evt[eidx][1]);
+                }
+                this.select(this.select());
             }
         } catch (e) {
             console.error(e.stack);
@@ -106,6 +119,11 @@ mf.comp.Menu = class extends mf.Component {
             } else {
                 /* setter */
                 this.style({ 'display' : (true === flg) ? 'flex' : null });
+                let relat = this.layout(["Relative", "Menu"]);
+                if (null === relat) {
+                    return;
+                }
+                relat.type((true === flg) ? "left" : "top");
             }
         } catch (e) {
             console.error(e.stack);
@@ -119,12 +137,11 @@ mf.comp.Menu = class extends mf.Component {
      * @param (number) select menu item index
      * @return (number) selected menu item index
      * @type parameter
-     * @note p2 : event flag (undefined/false is not execute select event)
      */
-    select (idx, flg) {
+    select (idx) {
         try {
             if ("number" === typeof idx) {
-                if (true === flg) {
+                if (idx !== this.select()) {
                     let evt = this.selectEvent();
                     for (let eidx in evt) {
                         evt[eidx][0](this, idx, evt[eidx][1]);
@@ -132,10 +149,15 @@ mf.comp.Menu = class extends mf.Component {
                 }
                 if (undefined !== this.contents()[idx]) {
                     let conts = this.contents();
-                    for (let cidx in conts) {
-                        conts[cidx].visible(false);
-                    }
-                    conts[idx].visible(true);
+                    this.contents()[this.select()].visible(
+                        false,
+                        () => {
+                            try { conts[idx].visible(true); } catch (e) {
+                                console.error(e.stack);
+                                throw e;
+                            }
+                        }
+                    );
                 }
             }
             return this.member("select", "number", idx, 0);
@@ -195,7 +217,7 @@ mf.comp.Menu = class extends mf.Component {
                     let itm = menu.item();
                     for (let iidx in itm) {
                         if (cp1.getId() === itm[iidx].getId()) {
-                            menu.select(parseInt(iidx), true);
+                            menu.select(parseInt(iidx));
                         }
                     }
                 } catch (e) {
@@ -220,10 +242,8 @@ mf.comp.Menu = class extends mf.Component {
      */
     offset (prm) {
         try {
-            if (undefined !== prm) {
-                mf.func.getSize(prm);
-            }
-            return this.member("offset", "string", prm);
+            let relat = this.layout(["Relative", "Menu"]);
+            return (null !== relat) ? relat.value(prm) : null;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -233,16 +253,30 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * contents component
      *
-     * @param (string/array) objkey of contents
-     * @return (array) objkey of contents
+     * @param (string/component/array) string: objkey of contents
+     *                                 component: component object
+     *                                 array: objkey(name) or component list
+     * @return (array) component object list
      * @type parameter
      */
     contents (prm) {
         try {
-            if (undefined !== prm) {
-                mf.objkey[prm].visible(false);
+            if (undefined === prm) {
+                return this.arrayMember("contents");
             }
-            return this.arrayMember("contents", "string", prm);
+            if (true === Array.isArray(prm)) {
+                for (let pidx in prm) {
+                    this.contents(prm[pidx]);
+                }
+                return; 
+            }
+            if ("string" === typeof prm) {
+                prm = mf.objkey[prm];
+            }
+            if (0 !== this.contents().length) {
+                prm.visible(false);
+            }
+            this.arrayMember("contents", "Component", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
