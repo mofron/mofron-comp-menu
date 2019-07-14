@@ -253,9 +253,9 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * contents component
      *
-     * @param (string/component/array) string: objkey of contents
+     * @param (string/component/array) string: objkey[name] of contents
      *                                 component: component object
-     *                                 array: objkey(name) or component list
+     *                                 array: objkey[name] or component list
      * @return (array) component object list
      * @type parameter
      */

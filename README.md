@@ -41,7 +41,7 @@ let evt = (p1,p2) => { console.log(p2); };
 | | | mixed | select event parameter |
 | ◯  | item | array/component | menu items |
 | | offset | string (size) | offset value |
-| | contents | string/component/array | string: objkey of contents |
+| | contents | string/component/array | string: objkey[name] of contents |
 | | | | component: component object |
-| | | name | or component list |
+| | | | array: objkey[name] or component list |
 
