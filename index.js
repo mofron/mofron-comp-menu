@@ -225,7 +225,10 @@ mf.comp.Menu = class extends mf.Component {
                     throw e;
                 }
             }
-            prm.option({ event: new Click(clk) });
+            prm.option({
+                event: new Click(clk), mainColor: this.mainColor(),
+                baseColor: this.baseColor(), accentColor: this.accentColor()
+            });
             this.child([prm]);
             this.arrayMember("item", "Component", prm);
         } catch (e) {
@@ -253,9 +256,9 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * contents component
      *
-     * @param (string/component/array) string: objkey[name] of contents
+     * @param (string/component/array) string: objkey of contents
      *                                 component: component object
-     *                                 array: objkey[name] or component list
+     *                                 array: objkey(name) or component list
      * @return (array) component object list
      * @type parameter
      */
@@ -277,6 +280,84 @@ mf.comp.Menu = class extends mf.Component {
                 prm.visible(false);
             }
             this.arrayMember("contents", "Component", prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * main color of items
+     *
+     * @param (string/array) string: color text
+     *                       array: [r,g,b,[a]]
+     *                       array: [color text, option]
+     * @param (string) color text
+     * @type parameter
+     */
+    mainColor (prm) {
+        try {
+            if (undefined === prm) {
+                return this.m_mnclr;
+            }
+            /* setter */
+            let itm = this.item();
+            for (let iidx in itm) {
+                itm[iidx].mainColor(prm);
+            }
+            this.m_mnclr = ("string" === typeof prm) ? [prm, undefined] : prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * base color of items
+     *
+     * @param (string/array) string: color text
+     *                       array: [r,g,b,[a]]
+     *                       array: [color text, option]
+     * @param (string) color text
+     * @type parameter
+     */
+    baseColor (prm) {
+        try {
+            if (undefined === prm) {
+                return this.m_bsclr;
+            }
+            /* setter */
+            let itm = this.item();
+            for (let iidx in itm) {
+                itm[iidx].baseColor(prm);
+            }
+            this.m_bsclr = ("string" === typeof prm) ? [prm, undefined] : prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * accent color of items
+     *
+     * @param (string/array) string: color text
+     *                       array: [r,g,b,[a]]
+     *                       array: [color text, option]
+     * @param (string) color text
+     * @type parameter
+     */
+    accentColor (prm) {
+        try {
+            if (undefined === prm) {
+                return this.m_acclr;
+            }
+            /* setter */
+            let itm = this.item();
+            for (let iidx in itm) {
+                itm[iidx].accentColor(prm);
+            }
+            this.m_acclr = ("string" === typeof prm) ? [prm, undefined] : prm;
         } catch (e) {
             console.error(e.stack);
             throw e;
