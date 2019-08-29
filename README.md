@@ -39,21 +39,19 @@ let evt = (p1,p2) => { console.log(p2); };
 | | select | number | select menu item index |
 | | selectEvent | function | select event function |
 | | | mixed | select event parameter |
-| ◯  | item | array/component | menu items |
+| ◯  | item | mixed | component: menu items component |
+| | | | array: menu items list |
 | | offset | string (size) | offset value |
-| | contents | string/component/array | string: objkey of contents |
+| | contents | mixed | string: objkey of contents |
 | | | | component: component object |
-| | | name | or component list |
-| | mainColor | string/array | string: color text |
-| | | | array: [r,g,b,[a]] |
-| | | | array: [color text, option] |
-| | | string | color text |
-| | baseColor | string/array | string: color text |
-| | | | array: [r,g,b,[a]] |
-| | | | array: [color text, option] |
-| | | string | color text |
-| | accentColor | string/array | string: color text |
-| | | | array: [r,g,b,[a]] |
-| | | | array: [color text, option] |
-| | | string | color text |
+| | | | array: objkey(name) or component list |
+| | mainColor | mixed | string: menu item color name, #hex |
+| | | | array: [red, green, blue, (alpha)] |
+| | | option | style option |
+| | baseColor | mixed | string: color name, #hex |
+| | | | array: [red, green, blue, (alpha)] |
+| | | option | style option |
+| | accentColor | mixed | string: color name, #hex |
+| | | | array: [red, green, blue, (alpha)] |
+| | | option | style option |
 
