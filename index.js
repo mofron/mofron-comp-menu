@@ -13,8 +13,8 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * initialize menu component
      *
-     * @param (array/object) array: menu item component list
-     *                       object: component option
+     * @param (mixed) array: item parameter
+     *                object: component option
      * @pmap item
      * @type private
      */
@@ -109,6 +109,7 @@ mf.comp.Menu = class extends mf.Component {
      * menu item is added in the horizontal direction if p1 setted true
      *
      * @param (boolean) set/unset horizontal mode
+     * @return (boolean) horizontal mode status
      * @type parameter
      */
     horizon (flg) {
@@ -194,8 +195,9 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * menu item
      *
-     * @param (array/component) menu items
-     * @return (array) menu items
+     * @param (mixed) component: menu items component
+     *                array: menu items list
+     * @return (array) menu items list
      * @type parameter
      */
     item (prm) {
@@ -241,6 +243,7 @@ mf.comp.Menu = class extends mf.Component {
      * offset position of menu item
      * 
      * @param (string (size)) offset value
+     * @return (string) offset value
      * @type parameter
      */
     offset (prm) {
@@ -256,9 +259,9 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * contents component
      *
-     * @param (string/component/array) string: objkey of contents
-     *                                 component: component object
-     *                                 array: objkey(name) or component list
+     * @param (mixed) string: objkey of contents
+     *                component: component object
+     *                array: objkey(name) or component list
      * @return (array) component object list
      * @type parameter
      */
@@ -289,13 +292,13 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * main color of items
      *
-     * @param (string/array) string: color text
-     *                       array: [r,g,b,[a]]
-     *                       array: [color text, option]
-     * @param (string) color text
+     * @param (mixed) string: menu item color name, #hex
+     *                array: [red, green, blue, (alpha)]
+     * @param (option) style option
+     * @return (string) menu item main color
      * @type parameter
      */
-    mainColor (prm) {
+    mainColor (prm, opt) {
         try {
             if (undefined === prm) {
                 return this.m_mnclr;
@@ -303,7 +306,7 @@ mf.comp.Menu = class extends mf.Component {
             /* setter */
             let itm = this.item();
             for (let iidx in itm) {
-                itm[iidx].mainColor(prm);
+                itm[iidx].mainColor(prm, opt);
             }
             this.m_mnclr = ("string" === typeof prm) ? [prm, undefined] : prm;
         } catch (e) {
@@ -315,13 +318,13 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * base color of items
      *
-     * @param (string/array) string: color text
-     *                       array: [r,g,b,[a]]
-     *                       array: [color text, option]
-     * @param (string) color text
+     * @param (mixed) string: color name, #hex
+     *                array: [red, green, blue, (alpha)]
+     * @param (option) style option
+     * @return (string) menu item base color
      * @type parameter
      */
-    baseColor (prm) {
+    baseColor (prm, opt) {
         try {
             if (undefined === prm) {
                 return this.m_bsclr;
@@ -329,7 +332,7 @@ mf.comp.Menu = class extends mf.Component {
             /* setter */
             let itm = this.item();
             for (let iidx in itm) {
-                itm[iidx].baseColor(prm);
+                itm[iidx].baseColor(prm, opt);
             }
             this.m_bsclr = ("string" === typeof prm) ? [prm, undefined] : prm;
         } catch (e) {
@@ -341,13 +344,13 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * accent color of items
      *
-     * @param (string/array) string: color text
-     *                       array: [r,g,b,[a]]
-     *                       array: [color text, option]
-     * @param (string) color text
+     * @param (mixed) string: color name, #hex
+     *                array: [red, green, blue, (alpha)]
+     * @param (option) style option
+     * @return (string) menu item accent color
      * @type parameter
      */
-    accentColor (prm) {
+    accentColor (prm, opt) {
         try {
             if (undefined === prm) {
                 return this.m_acclr;
@@ -355,7 +358,7 @@ mf.comp.Menu = class extends mf.Component {
             /* setter */
             let itm = this.item();
             for (let iidx in itm) {
-                itm[iidx].accentColor(prm);
+                itm[iidx].accentColor(prm, opt);
             }
             this.m_acclr = ("string" === typeof prm) ? [prm, undefined] : prm;
         } catch (e) {
