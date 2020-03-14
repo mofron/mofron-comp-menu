@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-menu",
-  "version": "0.3.14",
+  "version": "0.4.0",
   "description": "menu component for mofron",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "mofron-layout-relative" : ""
   },
   "keywords": [
-    "front-end"
+    "front-end","mofron"
   ],
   "author": "simparts",
   "license": "MIT",

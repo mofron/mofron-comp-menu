@@ -19,32 +19,26 @@ npm install mofron mofron-comp-menu
     <tag module="mofron-comp-menu">Menu</tag>
 </require>
 
-<script run=init>
-let evt = (p1,p2) => { console.log(p2); };
-</script>
-
-<Menu selectEvent=evt size="1.5rem","1rem" offset="-0.01rem">
-    <item>
+<Menu offset=-0.01rem horizon=true>
+    <item size=(1.5rem,0.5rem)>
         <TxtFrame>menu 1</TxtFrame>
         <TxtFrame>menu 2</TxtFrame>
         <TxtFrame>menu 3</TxtFrame>
     </item>
 </Menu>
 ```
+
 # Parameter
 
-|Simple<br>Param | Parameter Name | Type | Description |
-|:--------------:|:---------------|:-----|:------------|
+| Short<br>Form | Parameter Name | Type | Description |
+|:-------------:|:---------------|:-----|:------------|
 | | horizon | boolean | set/unset horizontal mode |
 | | select | number | select menu item index |
 | | selectEvent | function | select event function |
 | | | mixed | select event parameter |
 | ◯  | item | mixed | component: menu items component |
 | | | | array: menu items list |
-| | offset | string (size) | offset value |
-| | contents | mixed | string: objkey of contents |
-| | | | component: component object |
-| | | | array: objkey(name) or component list |
+| | offset | string(size) | offset value |
 | | mainColor | mixed | string: menu item color name, #hex |
 | | | | array: [red, green, blue, (alpha)] |
 | | | option | style option |

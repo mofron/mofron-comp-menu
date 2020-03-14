@@ -3,27 +3,42 @@
  * @brief menu component for mofron 
  * @feature configure the displayed contents when users click the menu by "contents" parameter
  *          "horizon" parameter is config that is horizontal menu item or vertical menu item
- * @author simpart
+ * @license MIT
  */
-const mf    = require("mofron");
 const Click = require("mofron-event-click");
 const Relat = require("mofron-layout-relative");
+const comutl = mofron.util.common;
 
-mf.comp.Menu = class extends mf.Component {
+module.exports = class extends mofron.class.Component {
     /**
      * initialize menu component
      *
-     * @param (mixed) array: item parameter
+     * @param (mixed) item parameter
      *                object: component option
-     * @pmap item
+     * @short item
      * @type private
      */
-    constructor (po) {
+    constructor (prm) {
         try {
             super();
             this.name("Menu");
-            this.prmMap("item");
-            this.prmOpt(po);
+            this.shortForm("item");
+            
+	    /* init config */
+	    this.confmng().add("item", { type: "Component", list: true });
+	    this.confmng().add("select", { type: "number", init: 0 });
+            this.confmng().add("selectEvent", { type: "event", list: true });
+            this.confmng().add("mainColor", { type: "color" });
+	    this.confmng().add("baseColor", { type: "color" });
+            this.confmng().add("accentColor", { type: "color" });
+	    this.confmng().add("mainColor_opt", { type: "object" });
+            this.confmng().add("baseColor_opt", { type: "object" });
+            this.confmng().add("accentColor_opt", { type: "object" });
+            
+	    /* set config */
+	    if (undefined !== prm) {
+                this.config(prm);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -53,25 +68,47 @@ mf.comp.Menu = class extends mf.Component {
     beforeRender () {
         try {
             super.beforeRender();
-            let chd = this.child();
+            /* set color */
+            let itm = this.item();
+            for (let iidx in itm) {
+	        if (null !== this.mainColor()) {
+                    itm[iidx].mainColor(
+		        this.mainColor(),
+			(null === this.confmng("mainColor_opt")) ? undefined : this.confmng("mainColor_opt")
+                    );
+		}
+		if (null !== this.baseColor()) {
+		    itm[iidx].baseColor(
+		        this.baseColor(),
+			(null === this.confmng("baseColor_opt")) ? undefined : this.confmng("baseColor_opt")
+	            );
+		}
+		if (null !== this.accentColor()) {
+		    itm[iidx].accentColor(
+		        this.accentColor(),
+			(null === this.confmng("accentColor_opt")) ? undefined : this.confmng("accentColor_opt")
+		    );
+		}
+	    }
+            
             /* set width */
-            if (null !== this.width()) {
-                let wid = mf.func.getSize(this.width());
-                if ( (true === this.horizon()) && (0 !== chd.length) ) {
-                    wid.value(wid.value()/chd.length);
-                }
-                for (let cidx in chd) {
-                    chd[cidx].width(wid.toString());
-                }
+	    let wid = comutl.getsize(this.width());
+            if (null !== wid) {
+	        if ((true === this.horizon()) && (0 !== itm.length)) {
+                    wid.value(wid.value()/itm.length);
+		}
+	        for (let widx in itm) {
+                    itm[widx].width(wid.toString());
+		}
             }
             /* set height */
-            if (null !== this.height()) {
-                let hei = mf.func.getSize(this.height());
-                if ( (true !== this.horizon()) && (0 !== chd.length) ) {
-                    hei.value(hei.value()/chd.length);
+	    let hei = comutl.getsize(this.height());
+            if (null !== hei) {
+                if ( (true !== this.horizon()) && (0 !== itm.length) ) {
+                    hei.value(hei.value()/itm.length);
                 }
-                for (let cidx in chd) {
-                    chd[cidx].height(hei.toString());
+                for (let hidx in itm) {
+                    itm[cidx].height(hei.toString());
                 }
             }
         } catch (e) {
@@ -89,14 +126,13 @@ mf.comp.Menu = class extends mf.Component {
     afterRender () {
         try {
             super.afterRender();
-            /* select defalut index */
+            /* defalut selected */
             if (undefined !== this.item()[this.select()]) {
-                this.item()[this.select()].eventTgt().getRawDom().click();
+                this.item()[this.select()].eventDom().getRawDom().click();
                 let evt = this.selectEvent();
                 for (let eidx in evt) {
                     evt[eidx][0](this, this.select(), evt[eidx][1]);
                 }
-                this.select(this.select());
             }
         } catch (e) {
             console.error(e.stack);
@@ -117,15 +153,14 @@ mf.comp.Menu = class extends mf.Component {
             if (undefined === flg) {
                 /* getter */
                 return ('flex' === this.style('display')) ? true : false;
-            } else {
-                /* setter */
-                this.style({ 'display' : (true === flg) ? 'flex' : null });
-                let relat = this.layout(["Relative", "Menu"]);
-                if (null === relat) {
-                    return;
-                }
-                relat.type((true === flg) ? "left" : "top");
             }
+            /* setter */
+            this.style({ 'display' : (true === flg) ? 'flex' : null });
+            let relat = this.layout({ name: "Relative", tag: "Menu" });
+            if (null === relat) {
+                return;
+            }
+            relat.type((true === flg) ? "left" : "top");
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -141,27 +176,18 @@ mf.comp.Menu = class extends mf.Component {
      */
     select (idx) {
         try {
-            if ("number" === typeof idx) {
-                if (idx !== this.select()) {
-                    let evt = this.selectEvent();
-                    for (let eidx in evt) {
-                        evt[eidx][0](this, idx, evt[eidx][1]);
-                    }
-                }
-                if (undefined !== this.contents()[idx]) {
-                    let conts = this.contents();
-                    this.contents()[this.select()].visible(
-                        false,
-                        () => {
-                            try { conts[idx].visible(true); } catch (e) {
-                                console.error(e.stack);
-                                throw e;
-                            }
-                        }
-                    );
-                }
-            }
-            return this.member("select", "number", idx, 0);
+            if (undefined === idx) {
+                /* getter */
+                return this.confmng("select");
+	    }
+	    /* setter */
+            if (idx !== this.select()) {
+                this.confmng("select", idx);
+		let evt = this.selectEvent();
+		for (let eidx in evt) {
+                    evt[eidx][0](this, idx, evt[eidx][1]);
+		}
+	    }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -178,14 +204,7 @@ mf.comp.Menu = class extends mf.Component {
      */
     selectEvent (fnc, prm) {
         try {
-            if ( (undefined !== fnc) && ("function" !== typeof fnc)) {
-                throw new Error("invalid parameter");
-            }
-            return this.arrayMember(
-                "selectEvent",
-                "object",
-                (undefined !== fnc) ? [fnc, prm] : undefined
-            );
+	    return this.confmng("selectEvent", fnc, prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -200,25 +219,25 @@ mf.comp.Menu = class extends mf.Component {
      * @return (array) menu items list
      * @type parameter
      */
-    item (prm) {
+    item (prm, opt) {
         try {
-            if (undefined === prm) {
-                /* getter */
-                return this.arrayMember("item", "Component");
+	    if (undefined === prm) {
+	        /* getter */
+	        return this.confmng("item", prm);
             }
             /* setter */
             if (true === Array.isArray(prm)) {
                 for (let pidx in prm) {
-                    this.item(prm[pidx]);
+                    this.item(prm[pidx], opt);
                 }
                 return;
             }
             let menu = this;
-            let clk = (cp1, cp2, cp3) => {
+            let clk  = (cp1, cp2, cp3) => {
                 try {
                     let itm = menu.item();
                     for (let iidx in itm) {
-                        if (cp1.getId() === itm[iidx].getId()) {
+                        if (cp1.id() === itm[iidx].id()) {
                             menu.select(parseInt(iidx));
                         }
                     }
@@ -227,12 +246,12 @@ mf.comp.Menu = class extends mf.Component {
                     throw e;
                 }
             }
-            prm.option({
-                event: new Click(clk), mainColor: this.mainColor(),
-                baseColor: this.baseColor(), accentColor: this.accentColor()
-            });
-            this.child([prm]);
-            this.arrayMember("item", "Component", prm);
+            prm.config({ event: new Click(clk) });
+	    if (undefined !== opt) {
+                prm.config(opt);
+	    }
+            this.child(prm);
+	    this.confmng("item", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -242,47 +261,14 @@ mf.comp.Menu = class extends mf.Component {
     /**
      * offset position of menu item
      * 
-     * @param (string (size)) offset value
-     * @return (string) offset value
+     * @param (string(size)) offset value
+     * @return (string(size)) offset value
      * @type parameter
      */
     offset (prm) {
         try {
-            let relat = this.layout(["Relative", "Menu"]);
+            let relat = this.layout({ name: "Relative", tag: "Menu" });
             return (null !== relat) ? relat.value(prm) : null;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * contents component
-     *
-     * @param (mixed) string: objkey of contents
-     *                component: component object
-     *                array: objkey(name) or component list
-     * @return (array) component object list
-     * @type parameter
-     */
-    contents (prm) {
-        try {
-            if (undefined === prm) {
-                return this.arrayMember("contents");
-            }
-            if (true === Array.isArray(prm)) {
-                for (let pidx in prm) {
-                    this.contents(prm[pidx]);
-                }
-                return; 
-            }
-            if ("string" === typeof prm) {
-                prm = mf.objkey[prm];
-            }
-            if (0 !== this.contents().length) {
-                prm.visible(false);
-            }
-            this.arrayMember("contents", "Component", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -300,15 +286,8 @@ mf.comp.Menu = class extends mf.Component {
      */
     mainColor (prm, opt) {
         try {
-            if (undefined === prm) {
-                return this.m_mnclr;
-            }
-            /* setter */
-            let itm = this.item();
-            for (let iidx in itm) {
-                itm[iidx].mainColor(prm, opt);
-            }
-            this.m_mnclr = ("string" === typeof prm) ? [prm, undefined] : prm;
+	    this.confmng("mainColor_opt", opt);
+	    return this.confmng("mainColor", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -326,15 +305,8 @@ mf.comp.Menu = class extends mf.Component {
      */
     baseColor (prm, opt) {
         try {
-            if (undefined === prm) {
-                return this.m_bsclr;
-            }
-            /* setter */
-            let itm = this.item();
-            for (let iidx in itm) {
-                itm[iidx].baseColor(prm, opt);
-            }
-            this.m_bsclr = ("string" === typeof prm) ? [prm, undefined] : prm;
+	    this.confmng("baseColor_opt", opt);
+	    return this.confmng("baseColor", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -352,20 +324,12 @@ mf.comp.Menu = class extends mf.Component {
      */
     accentColor (prm, opt) {
         try {
-            if (undefined === prm) {
-                return this.m_acclr;
-            }
-            /* setter */
-            let itm = this.item();
-            for (let iidx in itm) {
-                itm[iidx].accentColor(prm, opt);
-            }
-            this.m_acclr = ("string" === typeof prm) ? [prm, undefined] : prm;
+	    this.confmng("accentColor_opt", opt);
+	    return this.confmng("accentColor", prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 }
-module.exports = mf.comp.Menu;
 /* end of file */
