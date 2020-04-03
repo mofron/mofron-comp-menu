@@ -34,7 +34,7 @@ module.exports = class extends mofron.class.Component {
 	    this.confmng().add("mainColor_opt", { type: "object" });
             this.confmng().add("baseColor_opt", { type: "object" });
             this.confmng().add("accentColor_opt", { type: "object" });
-            
+
 	    /* set config */
 	    if (undefined !== prm) {
                 this.config(prm);
@@ -54,6 +54,22 @@ module.exports = class extends mofron.class.Component {
         try {
             super.initDomConts();
             this.layout(new Relat({ value: "0px", tag: "Menu" }));
+	    /* set select event */
+            let sel_evt = (s1,s2,s3) => {
+                try {
+                    let itm = s1.item();
+		    for (let iidx in itm) {
+		        if (false === comutl.isinc(itm[iidx], "MenuItem")) {
+                            continue;
+			}
+			itm[iidx].select((iidx == s2) ? true : false);
+		    }
+		} catch (e) {
+                    console.error(e.stack);
+		    throw e;
+		}
+	    }
+            this.selectEvent(sel_evt);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -91,30 +107,49 @@ module.exports = class extends mofron.class.Component {
 		}
 	    }
             
-            /* set width */
-	    let wid = comutl.getsize(this.width());
-            if (null !== wid) {
-	        if ((true === this.horizon()) && (0 !== itm.length)) {
-                    wid.value(wid.value()/itm.length);
-		}
-	        for (let widx in itm) {
-                    itm[widx].width(wid.toString());
-		}
-            }
-            /* set height */
-	    let hei = comutl.getsize(this.height());
-            if (null !== hei) {
-                if ( (true !== this.horizon()) && (0 !== itm.length) ) {
-                    hei.value(hei.value()/itm.length);
-                }
-                for (let hidx in itm) {
-                    itm[cidx].height(hei.toString());
-                }
-            }
+            /* init size */
+	    this.initSize("width", true);
+	    this.initSize("height", false);
+
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
+    }
+
+    /**
+     * initialize size
+     * 
+     * @param (string) size type ("width"/"height")
+     * @param (boolean) horizon type
+     * @type private
+     */
+    initSize (prm, hrz) {
+        try {
+	    let siz = comutl.getsize(this[prm]());
+	    let itm = this.item();
+            if (null !== siz) {
+		if ((hrz === this.horizon()) && (0 !== itm.length)) {
+		    siz.value(siz.value() / itm.length);
+                }
+                for (let sidx in itm) {
+                    itm[sidx][prm](siz.toString());
+		}
+	    } else {
+                /* size config is null, set value from items */
+                if ((hrz === this.horizon()) && (0 !== itm.length)) {
+		    let set_siz = null;
+                    for (let sidx in itm) {
+                        set_siz = comutl.sizesum(set_siz, itm[sidx][prm]());
+		    }
+		} else {
+		    this[prm](itm[0][prm]());
+		}
+	    }
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+	}
     }
     
     /**
