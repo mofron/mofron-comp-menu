@@ -26,6 +26,7 @@ module.exports = class extends mofron.class.Component {
             
 	    /* init config */
 	    this.confmng().add("item", { type: "Component", list: true });
+	    this.confmng().add("reselect", { type: "boolean", init: false });
 	    this.confmng().add("select", { type: "number", init: 0 });
             this.confmng().add("selectEvent", { type: "event", list: true });
             this.confmng().add("mainColor", { type: "color" });
@@ -128,6 +129,10 @@ module.exports = class extends mofron.class.Component {
         try {
 	    let siz = comutl.getsize(this[prm]());
 	    let itm = this.item();
+	    if (0 === itm.length) {
+	        console.warn("there is no items");
+                return;
+	    }
             if (null !== siz) {
 		if ((hrz === this.horizon()) && (0 !== itm.length)) {
 		    siz.value(siz.value() / itm.length);
@@ -216,7 +221,7 @@ module.exports = class extends mofron.class.Component {
                 return this.confmng("select");
 	    }
 	    /* setter */
-            if (idx !== this.select()) {
+            if ((true === this.reselect()) || (idx !== this.select())) {
                 this.confmng("select", idx);
 		let evt = this.selectEvent();
 		for (let eidx in evt) {
@@ -224,6 +229,23 @@ module.exports = class extends mofron.class.Component {
 		}
 	    }
         } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * reselect flag setter/getter
+     * 
+     * @param (boolean) true: call event when items are duplicates selected
+     *                  false: ignored when items are duplicates selected [default]
+     * @return (boolean) reselect flag
+     * @type parameter
+     */
+    reselect (prm) {
+        try {
+            return this.confmng("reselect", prm);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
