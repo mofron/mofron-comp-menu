@@ -14,10 +14,10 @@ npm install mofron mofron-comp-menu
 
 # Sample
 ```html
-<require>
+<setting>
     <tag module="mofron-comp-txtframe">TxtFrame</tag>
     <tag module="mofron-comp-menu">Menu</tag>
-</require>
+</setting>
 
 <Menu offset=-0.01rem horizon=true>
     <item size=(1.5rem,0.5rem)>
@@ -34,6 +34,8 @@ npm install mofron mofron-comp-menu
 |:-------------:|:---------------|:-----|:------------|
 | | horizon | boolean | set/unset horizontal mode |
 | | select | number | select menu item index |
+| | reselect | boolean | true: call event when items are duplicates selected |
+| | | | false: ignored when items are duplicates selected [default] |
 | | selectEvent | function | select event function |
 | | | mixed | select event parameter |
 | ◯  | item | mixed | component: menu items component |

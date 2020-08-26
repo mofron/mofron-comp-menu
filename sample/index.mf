@@ -1,7 +1,7 @@
-<require>
+<setting>
     <tag module="mofron-comp-txtframe">TxtFrame</tag>
     <tag module="mofron-comp-menu">Menu</tag>
-</require>
+</setting>
 
 <Menu offset=-0.01rem horizon=true>
     <item size=(1.5rem,0.5rem)>

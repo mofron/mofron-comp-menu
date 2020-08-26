@@ -21,19 +21,19 @@ module.exports = class extends mofron.class.Component {
     constructor (prm) {
         try {
             super();
-            this.name("Menu");
+            this.modname("Menu");
             this.shortForm("item");
             
 	    /* init config */
-	    this.confmng().add("item", { type: "Component", list: true });
-	    this.confmng().add("reselect", { type: "boolean", init: false });
-	    this.confmng().add("select", { type: "number", init: 0 });
-            this.confmng().add("selectEvent", { type: "event", list: true });
-            this.confmng().add("mainColor", { type: "color" });
-	    this.confmng().add("baseColor", { type: "color" });
-            this.confmng().add("accentColor", { type: "color" });
-	    this.confmng().add("mainColor_opt", { type: "object" });
-            this.confmng().add("baseColor_opt", { type: "object" });
+	    this.confmng().add("item",            { type: "Component", list: true });
+	    this.confmng().add("reselect",        { type: "boolean",   init: false });
+	    this.confmng().add("select",          { type: "number",    init: 0 });
+            this.confmng().add("selectEvent",     { type: "event",     list: true });
+            this.confmng().add("mainColor",       { type: "color" });
+	    this.confmng().add("baseColor",       { type: "color" });
+            this.confmng().add("accentColor",     { type: "color" });
+	    this.confmng().add("mainColor_opt",   { type: "object" });
+            this.confmng().add("baseColor_opt",   { type: "object" });
             this.confmng().add("accentColor_opt", { type: "object" });
 
 	    /* set config */
